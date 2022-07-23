@@ -7,10 +7,13 @@
  NC-Raws
  NaN-Raws
  ANi
- WMSUB
- SBSUB
+ 风车字幕组(WMSUB)
+ 银色子弹字幕组(SBSUB)
  jibaketa
  Lilith-Raws
+ LoliHouse(萝莉工坊)
+ CoolComic404（酷漫404)
+ Nekomoe kissaten(喵萌奶茶屋)
 ```
 ### 环境准备
 
