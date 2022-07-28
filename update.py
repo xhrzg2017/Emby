@@ -56,7 +56,7 @@ elif(judge[0] == "jibaketa"):
     EP = re.findall("\d+", name1[1])[0]
     seanson1 = name[length - 2]
     seanson = re.findall("\d+", seanson1)[0]
-    os.rename(text, newpath + 'S' + seanson + 'E' + EP + '-TVB.' + houzhui)
+    os.rename(text, newpath + 'S' + seanson + 'E' + EP + '-HK.' + houzhui)
     nn = name[length - 3]
     nn = nn.encode("ISO-8859-1").decode('utf-8')    
 elif(judge[0] == "Lilith-Raws"):
