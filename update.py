@@ -37,18 +37,7 @@ elif (judge[0] == "ANi"):
     os.rename(text, newpath + 'S' + seanson + 'E' + EP + '.' + houzhui)
 
 
-elif (judge[0] == "WMSUB"):
-    EP = judge[2]
-    seanson1 = name[length - 2]
-    seanson = re.findall("\d+", seanson1)[0]
-    os.rename(text, newpath + 'S' + seanson + 'E' + EP + '.' + houzhui)
 
-
-elif (judge[0] == "SBSUB"):
-    EP = judge[2]
-    seanson1 = name[length - 2]
-    seanson = re.findall("\d+", seanson1)[0]
-    os.rename(text, newpath + 'S' + seanson + 'E' + EP + '.' + houzhui)
 
 
 elif (judge[0] == "jibaketa"):
@@ -73,6 +62,20 @@ elif (judge[0] == "LoliHouse"):
     seanson = re.findall("\d+", seanson1)[0]
     os.rename(text, newpath + 'S' + seanson + 'E' + EP + '.' + houzhui)
 
+elif (judge[0] == "WMSUB"):
+    EP = judge[2]
+    SN = judge[1]
+    seanson1 = name[length - 2]
+    seanson = re.findall("\d+", seanson1)[0]
+    os.rename(text, newpath + SN + ' - S' + seanson + 'E' + EP + '.' + houzhui)
+
+
+elif (judge[0] == "SBSUB"):
+    EP = judge[2]
+    SN = judge[1]
+    seanson1 = name[length - 2]
+    seanson = re.findall("\d+", seanson1)[0]
+    os.rename(text, newpath + SN + ' - S' + seanson + 'E' + EP + '.' + houzhui)
 
 elif (judge[0] == "CoolComic404"):
     EP = judge[2]
