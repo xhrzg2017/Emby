@@ -17,10 +17,9 @@ judge = re.findall(zhengze, filename)
 if (judge[0] == "NC-Raws"):
     name1 = text.split(' - ')
     EP = re.findall("\d+", name1[1])[0]
-    SN = name1[0]
     seanson1 = name[length - 2]
     seanson = re.findall("\d+", seanson1)[0]
-    os.rename(text, newpath + SN + ' - S' + seanson + 'E' + EP + '.' + houzhui)
+    os.rename(text, newpath + 'S' + seanson + 'E' + EP + '.' + houzhui)
 
 
 elif (judge[0] == "NaN-Raws"):
@@ -33,10 +32,9 @@ elif (judge[0] == "NaN-Raws"):
 elif (judge[0] == "ANi"):
     name1 = text.split(' - ')
     EP = re.findall("\d+", name1[1])[0]
-    SN = name1[0]
     seanson1 = name[length - 2]
     seanson = re.findall("\d+", seanson1)[0]
-    os.rename(text, newpath + SN + ' - S' + seanson + 'E' + EP + '.' + houzhui)
+    os.rename(text, newpath + 'S' + seanson + 'E' + EP + '.' + houzhui)
 
 
 elif (judge[0] == "WMSUB"):
@@ -56,27 +54,24 @@ elif (judge[0] == "SBSUB"):
 elif (judge[0] == "jibaketa"):
     name1 = text.split(' - ')
     EP = re.findall("\d+", name1[1])[0]
-    SN = name1[0]
     seanson1 = name[length - 2]
     seanson = re.findall("\d+", seanson1)[0]
-    os.rename(text, newpath + SN + ' - S' + seanson + 'E' + EP + '-HK.' + houzhui)
+    os.rename(text, newpath + 'S' + seanson + 'E' + EP + '-HK.' + houzhui)
 
 
 elif (judge[0] == "Lilith-Raws"):
     name1 = text.split(' - ')
     EP = re.findall("\d+", name1[1])[0]
-    SN = name1[0]
     seanson1 = name[length - 2]
     seanson = re.findall("\d+", seanson1)[0]
-    os.rename(text, newpath + SN + ' - S' + seanson + 'E' + EP + '.' + houzhui)
+    os.rename(text, newpath + 'S' + seanson + 'E' + EP + '.' + houzhui)
 
 elif (judge[0] == "LoliHouse"):
     name1 = text.split(' - ')
     EP = re.findall("\d+", name1[1])[0]
-    SN = name1[0]
     seanson1 = name[length - 2]
     seanson = re.findall("\d+", seanson1)[0]
-    os.rename(text, newpath + SN + ' - S' + seanson + 'E' + EP + '.' + houzhui)
+    os.rename(text, newpath + 'S' + seanson + 'E' + EP + '.' + houzhui)
 
 
 elif (judge[0] == "CoolComic404"):
