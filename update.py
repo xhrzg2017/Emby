@@ -126,5 +126,5 @@ elif (judge[0] == "XKsub"):
 
 time.sleep(5)
 os.system(
-    'rclone copy --drive-chunk-size 64M /media/Emby_Temp/ emby1:/动漫追更/2022-7/ &')  # 这里只是例子，请根据自己的实际路径更改，/media/Emby_Temp/是存放所有动漫的文件夹，比如间谍过家家的目录是：/media/Emby_Temp/间谍过家家
+    'rclone copy --drive-chunk-size 64M /media/Emby_Temp/ gd1:/动漫追更/2022-7/ &')  # 这里只是例子，请根据自己的实际路径更改，/media/Emby_Temp/是存放所有动漫的文件夹，比如间谍过家家的目录是：/media/Emby_Temp/间谍过家家
 time.sleep(90)
