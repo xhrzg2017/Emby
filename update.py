@@ -3,6 +3,7 @@ import sys
 import re
 import os
 import time
+import shutil
 
 text = sys.argv[1]
 name = text.split('/')
@@ -180,5 +181,5 @@ upload='rclone copy --drive-chunk-size 64M /media/Emby_Temp/ gd1:/emby/02-动漫
 sh=upload.encode("utf-8").decode("latin1")
 os.system(sh)
 print('Upload successful')
-time.sleep(90)
-os.rmdir(newpath)
+time.sleep(5)
+shutil.rmtree(newpath[:-9])
