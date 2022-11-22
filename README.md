@@ -22,11 +22,10 @@ qBittorrent、rclone、Python3 & Pip3、已经搭建好的Emby
 #### qBittorrent
 
 ```
-wget https://github.com/c0re100/qBittorrent-Enhanced-Edition/releases/download/release-4.4.3.12/qbittorrent-enhanced-nox_x86_64-linux-musl_static.zip
+wget https://github.com/c0re100/qBittorrent-Enhanced-Edition/releases/download/release-4.4.5.10/qbittorrent-enhanced-nox_x86_64-linux-musl_static.zip
 apt install -y unzip
 unzip qbittorrent-enhanced-nox_x86_64-linux-musl_static.zip
 chmod +x ./qbittorrent-nox
-  
 ./qbittorrent-nox -d
 ```
 
