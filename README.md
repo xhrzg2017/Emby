@@ -41,6 +41,7 @@ curl https://rclone.org/install.sh | sudo bash
 ```
 rclone config
 ```
+```
 o remotes found - make a new one
 n) New remote
 s) Set configuration password
@@ -118,7 +119,7 @@ c) Copy remote
 s) Set configuration password
 q) Quit config
 e/n/d/r/c/s/q> q
-
+```
 3.路径创建
 share1= 团队盘1
 ```
