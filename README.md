@@ -119,45 +119,28 @@ s) Set configuration password
 q) Quit config
 e/n/d/r/c/s/q> q
 
-3.挂载
+3.路径创建
 ```
 mkdir -p /home/gdrive
-
-/usr/bin/rclone mount emby: /home/gdrive \
- --umask 0000 \
- --default-permissions \
- --allow-non-empty \
- --allow-other \
- --buffer-size 32M \
- --dir-cache-time 12h \
- --vfs-read-chunk-size 64M \
- --vfs-read-chunk-size-limit 1G &
-
 ```
-4、查看挂载
-```
-df -h
-```
-5、自动挂载
+4、设置开机脚步
 ```
 cat > /etc/systemd/system/rclone.service <<EOF
 [Unit]
 Description=Rclone
-AssertPathIsDirectory=LocalFolder
+AssertPathIsDirectory=/home/emby/media/share1
 After=network-online.target
 
 [Service]
-Type=simple
-ExecStart=/usr/bin/rclone mount emby: /home/gdrive \
- --umask 0000 \
- --default-permissions \
- --allow-non-empty \
- --allow-other \
- --buffer-size 32M \
- --dir-cache-time 12h \
- --vfs-read-chunk-size 64M \
- --vfs-read-chunk-size-limit 1G
-ExecStop=/bin/fusermount -u LocalFolder
+Type=notify
+ExecStart=/usr/bin/rclone mount gd1: /home/emby/media/share1  \
+--use-mmap --umask 000 --default-permissions \
+--no-check-certificate --allow-other --allow-non-empty \
+--vfs-cache-mode full \
+--buffer-size 256M --vfs-read-ahead 512M --vfs-read-chunk-size 32M \
+--vfs-read-chunk-size-limit off --vfs-cache-max-size 10G \
+--low-level-retries 200
+ExecStop=/bin/fusermount -qzu /home/emby/media/share1
 Restart=on-abort
 User=root
 
@@ -165,14 +148,227 @@ User=root
 WantedBy=default.target
 EOF
 ```
-6、设置启动
+
+5、设置启动
 ```
 systemctl start rclone
 ```
-7、开启启动
+6、开启启动
 ```
 systemctl enable rclone
 ```
+7、查看挂载
+```
+df -h
+```
+
+### Emby服务端
+### docker安装
+```
+#docker卸载 
+sudo apt-get remove docker docker-engine docker.io
+sudo apt-get update
+
+#设置apt使用HTTPS访问软件仓库
+
+sudo apt-get install \
+    apt-transport-https \
+    ca-certificates \
+    curl \
+    software-properties-common
+    
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+
+sudo add-apt-repository \
+    "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+    $(lsb_release -cs) \
+    stable"
+
+sudo apt-get update
+sudo apt-get install docker-ce
+```
+#### 解析 域名
+```
+src-emby.xxx.xyz（ipv4/6 机器ip）源站【一级反代】443-8096
+fz-emby.xxx.xyz（ipv4/6 机器ip）分站（客户入口）【二级分流】443-8096
+emby4.xxx.xyz（ipv4 机器ip）443-8096
+emby6.xxx.xyz（ipv6 机器ip）443-8096
+emby.xxx.xyz（ipv4/6 cdn ip)cdn站
+图片、静态cdn提供
+视频cdn重定向307 分站或源站
+
+```
+#### 1G小鸡 限制最大内存750m、cpu50%
+#### 转发模式
+```
+docker run -d --name emby \
+-m 750m \
+--cpus=1 \
+-p 8096:8096 \
+-v /home/emby/config:/config \
+-v /home/emby/media/:/media \
+-e TZ="Asia/Shanghai" \
+--device /dev/dri:/dev/dri \
+-e UID=1000 -e GID=100 \
+-e GIDLIST=100 \
+--restart unless-stopped \
+emby/embyserver:latest
+```
+#### 主机模式
+```
+docker run -d \
+    --name emby\
+    -m 750m \
+    --cpus=1 \
+    --volume /home/emby/config:/config \
+    --volume /home/emby/media:/media \
+    --net=host \
+    --env UID=0 \
+    --env GID=0 \
+    --env GIDLIST=0 \
+    --restart unless-stopped \
+    emby/embyserver:latest
+```
+#### 大佬优化（含插件）
+```
+docker run -d --name emby \
+-m 750m \
+--cpus=1 \
+-p 8096:8096/tcp \
+-v /home/emby/config:/config \
+-v /home/emby/media/:/media \
+-e TZ="Asia/Shanghai" \
+--device /dev/dri:/dev/dri \
+-e UID=0 -e GID=0 \
+-e GIDLIST=0 \
+--restart unless-stopped \
+lovechen/embyserver:latest
+```
+
+#### emby反代
+```
+    location /swagger {
+        return 404;
+    }
+
+    location = / {
+        return 302 web/index.html;
+    }
+
+    location / {
+        proxy_pass http://emby-backend;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Protocol $scheme;
+        proxy_set_header X-Forwarded-Host $http_host;
+        proxy_set_header REMOTE-HOST $remote_addr;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "";
+        proxy_set_header Accept-Encoding "";
+        proxy_http_version 1.1;
+        proxy_cache off;
+    }
+
+    location /web/ {
+        proxy_pass http://emby-backend;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Protocol $scheme;
+        proxy_set_header X-Forwarded-Host $http_host;
+        proxy_set_header REMOTE-HOST $remote_addr;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "";
+        proxy_set_header Accept-Encoding "";
+        proxy_http_version 1.1;
+        # 如果你使用cloudflare或其他缓存js|css文件，可取消下一行的注释来关闭本机缓存
+        # proxy_cache off;
+    }
+
+    location = /embywebsocket {
+        proxy_pass http://emby-backend;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Protocol $scheme;
+        proxy_set_header X-Forwarded-Host $http_host;
+        proxy_set_header REMOTE-HOST $remote_addr;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Accept-Encoding "";
+        proxy_http_version 1.1;
+        proxy_cache off;
+    }
+
+    location /emby/videos/ {
+        proxy_pass http://emby-backend;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Protocol $scheme;
+        proxy_set_header X-Forwarded-Host $http_host;
+        proxy_set_header REMOTE-HOST $remote_addr;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "";
+        proxy_set_header Accept-Encoding "";
+        proxy_http_version 1.1;
+        proxy_cache off;
+        proxy_buffering off;
+    }
+
+    location ~ ^/emby/videos/\d+/(?!live|\w+\.m3u8|hls1) {
+        slice 14m;
+
+        proxy_pass http://emby-backend;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Protocol $scheme;
+        proxy_set_header X-Forwarded-Host $http_host;
+        proxy_set_header REMOTE-HOST $remote_addr;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "";
+        proxy_set_header Accept-Encoding "";
+        proxy_set_header Range $slice_range;
+        proxy_ignore_headers Expires Cache-Control Set-Cookie X-Accel-Expires;
+        proxy_http_version 1.1;
+        proxy_connect_timeout 15s;
+
+        proxy_cache emby-videos;
+        proxy_cache_valid 200 206 301 302 7d;
+        proxy_cache_lock on;
+        proxy_cache_lock_age 60s;
+        proxy_cache_use_stale error timeout invalid_header updating http_500 http_502 http_503 http_504;
+        proxy_cache_key "$uri?MediaSourceId=$arg_MediaSourceId&VideoCodec=$arg_VideoCodec&AudioCodec=$arg_AudioCodec&AudioStreamIndex=$arg_AudioStreamIndex&VideoStreamIndex=$arg_VideoStreamIndex&ManifestSubtitles=$arg_ManifestSubtitles&VideoBitrate=$arg_VideoBitrate&AudioBitrate=$arg_AudioBitrate&SubtitleMethod=$arg_SubtitleMethod&TranscodingMaxAudioChannels=$arg_TranscodingMaxAudioChannels&SegmentContainer=$arg_SegmentContainer&MinSegments=$arg_MinSegments&BreakOnNonKeyFrames=$arg_BreakOnNonKeyFrames&h264-profile=$h264Profile&h264-level=$h264Level&slicerange=$slice_range";
+    }
+
+    location ~ ^/emby/Items/.*/Images/ {
+        proxy_pass http://emby-backend;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Protocol $scheme;
+        proxy_set_header X-Forwarded-Host $http_host;
+        proxy_set_header REMOTE-HOST $remote_addr;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "";
+        proxy_set_header Accept-Encoding "";
+        proxy_http_version 1.1;
+
+        proxy_cache emby;
+        proxy_cache_key $request_uri;
+        proxy_cache_revalidate on;
+        proxy_cache_lock on;
+    }
+```
+
 
 #### Python3 & Pip3
 
@@ -191,6 +387,7 @@ git clone https://github.com/xhrzg2017/Emby.git
 ![](https://tva4.sinaimg.cn/large/007dA9Dely8h2iks6781xj31ov0u00vm.jpg)
 
 ![](https://tva2.sinaimg.cn/large/007dA9Dely8h2iksmik7jj31ot0u0djt.jpg)
+
 
 
 ```
