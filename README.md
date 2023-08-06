@@ -99,9 +99,9 @@ n) No (default)
 y/n> y
 
 Choose a number from below, or type in your own value
-1 / 影音云端盘
+1 / 阿初宽频
 \ "0AGfwXXXXXXXXXXXX"
-2 / homenet6精英nas盘
+2 / 阿初宽频
 \ "0AXXXXXXXXXXXXXXX"
 Enter a Team Drive ID>
 
@@ -120,8 +120,9 @@ q) Quit config
 e/n/d/r/c/s/q> q
 
 3.路径创建
+share1= 团队盘1
 ```
-mkdir -p /home/gdrive
+mkdir -p /home/emby/media/share1
 ```
 4、设置开机脚步
 ```
