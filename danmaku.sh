@@ -13,7 +13,7 @@ else
 <link rel="stylesheet" href="https://danmaku.movie.kg/ext.css" />'
 
     # 在</body>之前插入代码
-    new_content=$(echo -e "${content/<\/head>/$code<\/body>}")
+    new_content=$(echo -e "${content/<\/body>/$code<\/body>}")
 
     # 将新内容写入index.html文件
     echo -e "$new_content" > index.html
