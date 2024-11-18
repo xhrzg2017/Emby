@@ -1,4 +1,4 @@
-# Emby及自动追剧系统搭建
+# qb自动追剧系统搭建
 
 本文所有教程基于root用户，默认git clone后文件夹地址为：/root/Emby
 
