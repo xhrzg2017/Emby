@@ -49,13 +49,15 @@ docker run -d --name emby \
 --restart unless-stopped \
 lovechen/embyserver:latest
 ```
+#### 容器内部sh
+```
 docker exec -it emby sh
-
-美化
+```
+#### 美化
 ```
  docker exec emby /bin/sh -c 'cd /system/dashboard-ui && wget -O - https://tinyurl.com/2p97xcpd | sh'
 ```
-旧版网页 弹幕
+#### 旧版网页 弹幕
 ```
 docker exec emby /bin/sh -c 'cd /system/dashboard-ui && wget -O - https://raw.githubusercontent.com/xhrzg2017/Emby/main/danmaku.sh | sh'
 ```
